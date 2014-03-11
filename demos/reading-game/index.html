@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	
+        <title>A simple reading game using Scribe (A Speech Recognition Javascript Library)</title>
+	
+        <meta name="author" content="http://dholmes.co.uk">
+	<meta name="description" content="A simple reading game using Scribe (A Speech Recognition Javascript Library)">
+        
+        <link rel="publisher" href="https://plus.google.com/+DesHolmes_CTD"/>
+        <meta itemprop="name" content="A simple reading game for Scribe"/>
+        <meta itemprop="description" content="A simple reading game using Scribe (A Speech Recognition Javascript Library)"/>
+        
+        <meta name="twitter:card" content="summary"/>
+        <meta name="twitter:title" content="A simple reading game for Scribe">
+        <meta name="twitter:description" content="A simple reading game using Scribe (A Speech Recognition Javascript Library)"/>
+        <meta name="twitter:domain" content="https://secure1280.hostgator.com/~redbit/scribe/reading-game"/>
+        
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="A simple reading game for Scribe"/>
+        <meta property="og:description" content="A simple reading game using Scribe (A Speech Recognition Javascript Library)"/>
+        <meta property="og:url" content="https://secure1280.hostgator.com/~redbit/scribe/reading-game"/>
+        <meta property="og:site_name" content="A simple reading game for Scribe"/>
+        <meta property="og:see_also" content="http://dholmes.co.uk"/>
+        
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="css/normalize.css" rel="stylesheet" media="all">
+	<link href="css/styles.css" rel="stylesheet" media="all">
+        
+</head>
+<body>
+
+    <main role="main">
+        <div id="notice"></div>
+        <div id="read_these"></div>
+        <div id="scribed_words"></div>
+        <div id="guesses"></div>
+        <div id="score_board"></div>
+    </main>
+
+    <footer role="contentinfo" style="clear:both">
+        <small>Created by <a href="https://plus.google.com/+DesHolmes_CTD/?rel=author">Des Holmes</a> using <a href="http://scribe.dholmes.co.uk/">Scribe</a>.</small>
+    </footer>
+ 
+    
+    <div id="allow-permission">
+        <h2>Press 'Allow' to play <span>&#10548;</span></h2>
+    </div>
+    
+    <div id="no-support">
+
+        <h2>Oh No! Your browser doesn't support the Web Speech API...</h2>
+
+        <p>Don't panic, <a href="https://www.google.com/intl/en/chrome/browser/">download Chrome</a>. Everything's going to be alright.</p>
+
+    </div>
+
+    <div id="permission-blocked">
+
+        <h2>You blocked microphone access :(</h2>
+
+        <p>Update your settings. Copy and paste this into your address bar - chrome://settings/contentExceptions#media-stream</p>
+
+    </div>
+
+<script src="js/scribe.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+
+
+var words = ['cat','dog','rat','cow'];
+var words_guessed = [];
+
+var score = 0;
+var score_add = 5;
+var score_minus = 2;
+var fade_time = 170;
+var score_board = document.getElementById("score_board");
+var guesses = document.getElementById("guesses");
+var read_these = document.getElementById("read_these");
+var scribed_words = document.getElementById("scribed_words");
+var guess_number = 0;
+var number_of_guesses = words.length-1;
+
+var matchWord = function(word) {
+        scribed_words.setAttribute('class', 'result');
+	displayScribedWord(word);
+
+	//debug
+        console.log(word);
+	// console.log(words.indexOf(word) > -1);
+
+	var active_word = document.getElementById(word);
+
+	if(words.indexOf(word) > -1 && words_guessed[word]!=true){
+                words_guessed[word] = true;
+		active_word.setAttribute("class","matched-word");
+		updateScore("add");
+	} else {
+		updateScore("minus");		
+	}
+        
+        guess_number +=1;
+        gameComplete();
+        setTimeout((function listening(){scribed_words.setAttribute('class', 'listening');}),2000);
+}
+
+var removeWords = function(){
+    for (var i = 0; i < words.length; i++) {
+        read_these.removeChild(document.getElementById(words[i]));
+    }
+}
+
+var addWords = function(){
+    // add words
+    for (var i = 0; i < words.length; i++) {
+            var p = document.createElement("p"); 
+            p.innerHTML = words[i];
+            p.setAttribute("id",words[i]);
+            read_these.appendChild(p);
+            words_guessed[words[i]] = false;
+    };
+}
+
+var displayScribedWord = function(word) {
+	var p = document.createElement("p"); 
+	p.innerHTML = '"' + word + '"';
+	p.setAttribute("id","scribed_" + word);
+	scribed_words.appendChild(p);
+	p = document.getElementById("scribed_" + word);
+	fadeAndKill(p,"scribed");
+}
+
+var fadeAndKill = function(dom_ref,type) {
+	var s = dom_ref.style;
+	s.opacity = (s.opacity!="") ? s.opacity: 1; 
+	(function fadeout(){(s.opacity-=.1)<.1?killWord(dom_ref,type):setTimeout(fadeout,fade_time);})();
+}
+
+
+var killWord = function(dom_ref,type) {
+	if(type=="read"){
+		read_these.removeChild(dom_ref);	
+	} else if(type=="scribed"){
+		scribed_words.removeChild(dom_ref);	
+	}
+}
+
+var hideAndfadeUp = function(dom_ref) {
+	var s = dom_ref.style;
+	s.opacity = 0;
+	(function fadeup(){(s.opacity=+(s.opacity)+.1)>.9?s.opacity=1:setTimeout(fadeup,fade_time);})();
+}
+
+
+var updateScore = function(val) {
+	hideAndfadeUp(score_board);
+        hideAndfadeUp(guesses);
+	if(val=="add"){
+		score += score_add;
+	} else if(val=="minus" && (score-score_minus>=0)) {
+		score -= score_minus;	
+	} else if(val=="reset"){
+		guess_number = score = 0;
+	}
+	updateScoreBoard();
+}
+
+var updateScoreBoard = function() {
+	score_board.innerHTML = "Score: " + score;
+        guesses.innerHTML = "Guesses left: " + (number_of_guesses-guess_number);
+        
+}
+
+var gameComplete = function() {
+	// debug
+	// console.log(read_these.childNodes.length);
+
+	//if(read_these.childNodes.length==0) {
+        if(guess_number==words.length){
+            removeWords();
+		var message = "";
+		if(score==0){
+			message = "You didn't get many correct.";
+		} else if (score > 10 && score < 20) {
+			message = "You did great!";
+		} else if (score == 20) {
+			message = "You got them all correct!";
+		}
+		message += "<br/><a href=\"./\">play again?</a>";
+		var p = document.createElement("p"); 
+		p.innerHTML = message;
+		read_these.appendChild(p);
+	}
+}
+
+var hideDomByID = function(dom_id) {
+    document.getElementById(dom_id).setAttribute('style', 'display:none');
+}
+
+var showNotice = function(dom_id) {
+    document.getElementById('notice').appendChild(document.getElementById(dom_id));
+    document.getElementById(dom_id).setAttribute('style', 'display:block');
+}
+
+var showPermissonPrompt = function() {
+    // Advise the user to allow the permission in prompt
+    showNotice('allow-permission');
+}
+
+var showUserBlockedScribe = function(){ 
+    // display notice that user has blocked access to the mic, and therefore Scribe
+    showNotice('permission-blocked');
+    // Kill permissions prompt (user has blocked)
+    hideDomByID('allow-permission');
+}
+
+var scribeStarted = function() {
+    // The user granted permission and Scribe has started!
+    // hide prompts and errors
+    hideDomByID('permission-blocked');
+    hideDomByID('allow-permission');
+    scribed_words.setAttribute('class', 'listening');
+}
+
+var onInterimResult = function() {
+    scribed_words.setAttribute('class', 'ssshh');
+}
+
+
+updateScoreBoard();
+addWords();
+
+/*
+var onKeyPress = function(e){
+ 	var key = e.key || e.keyCode || e.which;
+
+ 	if(key==13){
+ 		matchWord(words[guess_number]);
+ 		//guess_number+=1;
+ 	}
+
+ 	// debug
+ 	console.log(key);
+}
+// add press key evet handler
+window.addEventListener("keypress", onKeyPress, false);
+*/
+
+// scribe stuff
+if(!scribe) {
+	console.log("Web Speech API not supported by your browser.");
+        showNotice('no-support');
+} else {
+
+	// add callbacks
+        // add permission prompt
+        scribe.addCallback("permissonPrompt",showPermissonPrompt);
+        // add user blocked microphone access
+        scribe.addCallback("errorPermissionBlocked",showUserBlockedScribe);
+        // add user allowed access and Scribe has started
+	scribe.addCallback("onStart",scribeStarted);
+        // add result matched
+	scribe.addCallback("resultMatch",matchWord);
+        // add interim result 
+        scribe.addCallback("onInterimResult",onInterimResult);
+
+	// allowing interim results (faster but less reliable)
+	scribe.enableInterimResult(true);
+	scribe.enableInterimResultReturn(false);
+	
+	// enable debug messages
+	scribe.enableDebug(true);
+	
+	// init
+	scribe.start();
+}
+</script>
+</body>
+</html>

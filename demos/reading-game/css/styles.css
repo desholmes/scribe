@@ -1,0 +1,131 @@
+v/* ---------------------------------------------------------
+   HTML5 Bones
+   This stylesheet contains print styling and a section for 
+   you to simply add your own. This is a basic template 
+   after all.
+   ---------------------------------------------------------*/
+	body {
+   
+	}
+	/* Default link styling */
+	a:link { color:#0271fb; }
+	a:visited { color:#bd02fb; }
+	a:hover, a:focus { color:#000; }
+	a:active { color:#fb0e02; }
+	
+	
+	
+/* ---------------------------------------------------------
+   Author's styles
+   ---------------------------------------------------------*/
+	body {
+            
+	}
+
+        article,
+        header {
+            padding: 0 10px;
+        }
+        
+        footer {
+            padding: 10px 20px;
+            background-color: black;
+            color: #fff;
+        }
+        footer a:link,
+        footer a:hover,
+        footer a:visited {
+            color: #fff;
+        }
+        
+        #no-support,
+        #permission-blocked {
+            padding: 0.5rem 1.5rem;
+            background-color: #ff0033;
+            display: none;
+        }
+        #no-support h2,
+        #permission-blocked h2 {
+            color: #fff;
+        }
+        #no-support a,
+        #no-support p,
+        #permission-blocked a,
+        #permission-blocked p {
+            color: #fff;
+        }
+        
+        #read_these,
+        #scribed_words {
+            width: 50%;
+            float: left;
+            height: 30em;
+            background-color: cornflowerblue;
+        }
+        #read_these p {
+            font-size: 5rem;
+            font-weight: bold;
+            margin: 0;
+            padding: 0.75rem 1rem;
+        }
+        #scribed_words p {
+            font-size: 10rem;
+            font-weight: bold;
+            margin: 0;
+            padding: 0.75rem 1rem;
+        }
+        #read_these a {
+            color: #000;
+        }
+
+        #read_these p.matched-word {
+            text-decoration:line-through;
+            font-weight: normal;
+        }
+        
+        #score_board,
+        #guesses {
+           font-size: 5rem;
+           font-weight: bold;
+           padding: 0.75rem 1rem;
+        }
+        
+        #score_board {
+            float: right;
+        }
+        
+        #guesses {
+            float: left;
+        }
+        
+        #allow-permission {
+            padding: 5px 54px 0.5rem 0;
+            text-align: right;
+            background-color: green;
+            display: none;
+        }
+        #allow-permission h2 {
+            margin: 0;
+            color: #fff;
+        }
+        #allow-permission h2 span {
+            margin-top:-10px;
+        }
+
+        .listening {
+            background: url('../images/listening.png') no-repeat;
+            background-position: right 50px top 50px;
+            background-size: 150px;
+        }
+        
+        .ssshh {
+            background: url('../images/ssshh.png') no-repeat;
+            background-position: right 50px top 50px;
+            background-size: 150px;
+        }
+        
+        .result {
+            background: url('../images/result.png') no-repeat;
+            background-position: right 50px top 50px;
+            background-size: 150px;
+        }
